@@ -1,0 +1,64 @@
+<!--
+  Program name: thankyou.html
+  Author: STEVEN KOLAK
+  Date created: 2/27/26
+  Date last edited: 2/27/26
+  Version: 1.0
+  Description: Confirmation page displayed after ClearPath Medical
+               patient registration form is submitted.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClearPath Medical – Submission Confirmed</title>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Banner — same as main form -->
+<div id="banner">
+    <svg width="60" height="60" viewBox="0 0 60 60" aria-label="ClearPath Medical Logo">
+        <circle cx="30" cy="30" r="28" fill="#2E86C1"/>
+        <rect x="26" y="14" width="8" height="32" rx="2" fill="white"/>
+        <rect x="14" y="26" width="32" height="8" rx="2" fill="white"/>
+    </svg>
+    <div id="banner-text">
+        <h1>ClearPath Medical</h1>
+    </div>
+</div>
+
+<!-- Thank you message -->
+<div id="form-container" style="text-align:center; padding: 60px 40px;">
+    <h2>Thank You for Your Submission!</h2>
+    <p>Your patient registration has been received.</p>
+    <p>Our team will review your information and contact you within 1–2 business days.</p>
+    <p>For immediate assistance, please call <strong>(713) 555-0100</strong>.</p>
+    <br>
+    <a href="patient-form.html">&larr; Return to Registration Form</a>
+</div>
+
+<!-- Footer -->
+<div id="footer">
+    <div id="footer-left">
+        <p><strong>ClearPath Medical</strong></p>
+        <p>PO Box 5500</p>
+        <p>Houston, TX 77002</p>
+    </div>
+    <div id="footer-center">
+        <button onclick="window.location.href='mailto:contact@clearpathmedical.com'">
+            Contact Us
+        </button>
+    </div>
+    <div id="footer-right">
+        <a href="https://facebook.com"  target="_blank">Facebook</a> |
+        <a href="https://twitter.com"   target="_blank">Twitter</a> |
+        <a href="https://linkedin.com"  target="_blank">LinkedIn</a>
+    </div>
+</div>
+
+<!-- END OF DOCUMENT: thankyou.html -->
+</body>
+</html>
