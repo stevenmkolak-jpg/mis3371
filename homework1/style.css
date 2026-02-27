@@ -62,7 +62,7 @@ h2 {
 }
 
 /* ===== ID SELECTOR - main form container ===== */
-#main-content {
+##form-container {
     max-width: 900px;
     margin: 30px auto;
     background: #ffffff;
