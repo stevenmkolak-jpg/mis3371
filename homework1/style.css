@@ -1,0 +1,199 @@
+/*
+Program name: style.css
+Author: STEVEN KOLAK
+Date created: 2/27/26
+Date last edited: 2/27/26
+Version: 1.0
+Description: External stylesheet for ClearPath Medical Patient Registration Form.
+             Defines colors, fonts, layout, and form styling.
+*/
+
+/* ===== IMPORT GOOGLE FONT ===== */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Merriweather:wght@700&display=swap');
+
+/* ===== BODY TAG SELECTOR ===== */
+body {
+    background-color: #eef4f9;
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    color: #2c3e50;
+    margin: 0;
+    padding: 0;
+}
+
+/* ===== ID SELECTOR - banner div ===== */
+#banner {
+    background-color: #1a5276;
+    color: #ffffff;
+    padding: 18px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+#banner img {
+    height: 60px;
+}
+
+/* ===== CLASS SELECTOR - banner text ===== */
+.banner-title {
+    font-family: 'Merriweather', serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.banner-date {
+    font-size: 14px;
+    font-style: italic;
+    color: #aed6f1;
+}
+
+/* ===== TAG SELECTOR - headings ===== */
+h1, h2, h3 {
+    font-family: 'Merriweather', serif;
+    color: #1a5276;
+}
+
+h2 {
+    border-bottom: 2px solid #aed6f1;
+    padding-bottom: 5px;
+    margin-top: 25px;
+}
+
+/* ===== ID SELECTOR - main form container ===== */
+#main-content {
+    max-width: 900px;
+    margin: 30px auto;
+    background: #ffffff;
+    padding: 30px 40px;
+    border-radius: 8px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+}
+
+/* ===== TAG SELECTOR - table inside form ===== */
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+td {
+    padding: 7px 10px;
+    vertical-align: middle;
+}
+
+/* ===== CLASS SELECTOR - label cells ===== */
+.label-cell {
+    width: 200px;
+    font-weight: 600;
+    color: #1a5276;
+    text-align: right;
+    padding-right: 15px;
+}
+
+/* ===== TAG SELECTOR - inputs and selects ===== */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"],
+select,
+textarea {
+    padding: 7px 10px;
+    border: 1px solid #aab7c4;
+    border-radius: 4px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    color: #2c3e50;
+    background-color: #f7fbff;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+input[type="range"] {
+    width: 220px;
+}
+
+/* ===== NAME SELECTOR - password fields ===== */
+input[name="password"],
+input[name="confirm_password"] {
+    letter-spacing: 2px;
+}
+
+/* ===== CLASS SELECTOR - section headers inside form ===== */
+.section-header td {
+    background-color: #d6eaf8;
+    font-weight: 700;
+    font-size: 15px;
+    color: #1a5276;
+    padding: 10px 10px;
+    letter-spacing: 0.5px;
+}
+
+/* ===== TAG SELECTOR - buttons ===== */
+button {
+    font-family: 'Nunito', sans-serif;
+    font-size: 14px;
+    padding: 10px 28px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    margin: 6px;
+    font-weight: 700;
+}
+
+button[type="reset"] {
+    background-color: #e74c3c;
+    color: #ffffff;
+}
+
+button[type="submit"] {
+    background-color: #1a5276;
+    color: #ffffff;
+}
+
+button:hover {
+    opacity: 0.85;
+}
+
+/* ===== ID SELECTOR - footer ===== */
+#footer {
+    background-color: #1a5276;
+    color: #aed6f1;
+    text-align: center;
+    padding: 20px 30px;
+    font-size: 13px;
+    margin-top: 40px;
+}
+
+#footer a {
+    color: #aed6f1;
+    text-decoration: none;
+    margin: 0 10px;
+}
+
+/* ===== TAG SELECTOR - visited links ===== */
+a:visited {
+    color: #7fb3d3;
+}
+
+a:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+/* ===== CLASS SELECTOR - contact button in footer ===== */
+.footer-btn {
+    background-color: #aed6f1;
+    color: #1a5276;
+    padding: 8px 20px;
+    border-radius: 4px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    margin: 8px 5px;
+}
+
+.slider-label {
+    font-size: 13px;
+    color: #5d6d7e;
+}
