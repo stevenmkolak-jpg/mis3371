@@ -1,1 +1,142 @@
-placeholder
+<!--
+Program name: patient-form.html
+Author: STEVEN KOLAK
+Date created: 2/27/26
+Date last edited: 2/27/26
+Version: 1.0
+Description: ClearPath Medical patient registration form. Captures demographic,
+             contact, health history, login credentials, and insurance information
+             for new patient onboarding. Uses external CSS (style.css) for styling.
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- PAGE TITLE shown in browser tab -->
+    <title>ClearPath Medical – Patient Registration</title>
+    <!-- EXTERNAL CSS LINK - all styles are in this file -->
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- ============================================================
+     BANNER / HEADER DIVISION
+     Contains logo, clinic name, and dynamic date via JavaScript
+     ============================================================ -->
+<div id="banner">
+    <div style="display:flex; align-items:center; gap:18px;">
+        <!-- Logo image uploaded to same folder -->
+        <img src="logo.png" alt="ClearPath Medical Logo">
+        <span class="banner-title">ClearPath Medical</span>
+    </div>
+    <div class="banner-date">
+        <!-- INLINE JAVASCRIPT: dynamically displays today's day and date -->
+        Today is:
+        <script>
+            const days = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+            const months = ["January","February","March","April","May","June",
+                            "July","August","September","October","November","December"];
+            const suffixes = ["th","st","nd","rd"];
+            const now = new Date();
+            const day = days[now.getDay()];
+            const month = months[now.getMonth()];
+            const date = now.getDate();
+            const year = now.getFullYear();
+            // Determine ordinal suffix (1st, 2nd, 3rd, 4th...)
+            const mod100 = date % 100;
+            const mod10 = date % 10;
+            let suffix = "th";
+            if (mod100 < 11 || mod100 > 13) {
+                if (mod10 === 1) suffix = "st";
+                else if (mod10 === 2) suffix = "nd";
+                else if (mod10 === 3) suffix = "rd";
+            }
+            document.write(day + ", " + month + " " + date + suffix + ", " + year);
+        </script>
+    </div>
+</div>
+<!-- END BANNER -->
+
+<!-- ============================================================
+     MAIN CONTENT DIVISION - contains the registration form
+     ============================================================ -->
+<div id="main-content">
+
+    <h2>New Patient Registration</h2>
+    <p>Please fill out all required fields (<span style="color:red;">*</span>) and submit the form when complete. Use the <strong>Tab</strong> key to move between fields.</p>
+
+    <!-- FORM: no method attribute since this is client-side only.
+         Action sends user to thank you page on submit. -->
+    <form action="thankyou.html" id="registrationForm" onsubmit="return validateForm()">
+
+        <table>
+
+            <!-- ===== SECTION: PERSONAL INFORMATION ===== -->
+            <tr class="section-header">
+                <td colspan="2">&#128100; Personal Information</td>
+            </tr>
+
+            <!-- First Name, Middle Initial, Last Name on same row -->
+            <tr>
+                <td class="label-cell">First Name <span style="color:red;">*</span></td>
+                <td>
+                    <input type="text" name="firstname" id="firstname" maxlength="30"
+                           placeholder="First name" required tabindex="1">
+                </td>
+            </tr>
+            <tr>
+                <td class="label-cell">Middle Initial</td>
+                <td>
+                    <input type="text" name="middleinit" id="middleinit" maxlength="1"
+                           placeholder="M.I." size="3" style="width:50px;" tabindex="2">
+                </td>
+            </tr>
+            <tr>
+                <td class="label-cell">Last Name <span style="color:red;">*</span></td>
+                <td>
+                    <input type="text" name="lastname" id="lastname" maxlength="30"
+                           placeholder="Last name" required tabindex="3">
+                </td>
+            </tr>
+
+            <!-- Date of Birth -->
+            <tr>
+                <td class="label-cell">Date of Birth <span style="color:red;">*</span></td>
+                <td>
+                    <!-- Text input enforces MM/DD/YYYY pattern display -->
+                    <input type="text" name="dob" id="dob" maxlength="10"
+                           placeholder="MM/DD/YYYY"
+                           pattern="\d{2}/\d{2}/\d{4}"
+                           title="Enter date in MM/DD/YYYY format"
+                           required tabindex="4">
+                </td>
+            </tr>
+
+            <!-- Social Security Number - obscured via password type -->
+            <tr>
+                <td class="label-cell">Social Security # <span style="color:red;">*</span></td>
+                <td>
+                    <input type="password" name="ssn" id="ssn"
+                           minlength="9" maxlength="11"
+                           placeholder="###-##-####"
+                           autocomplete="off" required tabindex="5">
+                    <br><small class="slider-label">Your SSN is encrypted and stored securely.</small>
+                </td>
+            </tr>
+
+            <!-- ===== SECTION: ADDRESS ===== -->
+            <tr class="section-header">
+                <td colspan="2">&#127968; Address</td>
+            </tr>
+
+            <tr>
+                <td class="label-cell">Address Line 1 <span style="color:red;">*</span></td>
+                <td>
+                    <input type="text" name="addr1" id="addr1" maxlength="30"
+                           placeholder="Street address" required tabindex="6">
+                </td>
+            </tr>
+            <tr>
+                <td class="l
