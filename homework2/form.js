@@ -439,11 +439,9 @@ function validateZip() {
 function updateSalaryDisplay(value) {
     const display = document.getElementById('health-val');
     if (display) {
-        const formatted = '$' + parseInt(value).toLocaleString() + '/yr';
-        display.textContent = formatted;
+        display.textContent = value;
     }
 }
-
 /* ============================================================
    MODULE: showReview
    Collects all form data and displays the review panel.
