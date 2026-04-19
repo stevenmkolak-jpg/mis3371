@@ -1,29 +1,53 @@
 /*
-  Program name: form.js
+  Program name: form3.js
   Author: STEVEN KOLAK
-  Date created: 3/27/26
-  Date last edited: 3/27/26
-  Version: 2.0
-  Description: External JavaScript for ClearPath Medical Patient Registration Form.
-               Contains all validation modules, dynamic events, and review display logic.
+  Date created: 4/18/26
+  Version: 3.0
+  Description: External JavaScript for ClearPath Medical Patient Registration Form (HW3).
+               All validation done on-the-fly via oninput/onblur events.
+               SSN auto-formats as typed. Phone auto-formats as typed.
+               Submit button only revealed when ALL validations pass.
+               Error spans pre-sized so form never jumps.
 */
 
 /* ============================================================
-   MODULE: calculateDateBounds
-   Computes min/max dates for the DOB date input.
-   DOB must be between today and 120 years ago.
+   UTILITY: showError / clearError
+   Writes message into pre-reserved span; never blank (uses &nbsp;).
+   ============================================================ */
+function showError(fieldId, message) {
+    const span = document.getElementById('err-' + fieldId);
+    if (span) {
+        span.textContent = '⚠ ' + message;
+        span.classList.add('active');
+    }
+}
+
+function clearError(fieldId) {
+    const span = document.getElementById('err-' + fieldId);
+    if (span) {
+        span.textContent = '\u00A0'; // non-breaking space keeps height
+        span.classList.remove('active');
+    }
+}
+
+/* ============================================================
+   UTILITY: hasError
+   Returns true if the span currently shows an error.
+   ============================================================ */
+function hasError(fieldId) {
+    const span = document.getElementById('err-' + fieldId);
+    return span && span.classList.contains('active');
+}
+
+/* ============================================================
+   UTILITY: calculateDateBounds
    ============================================================ */
 function calculateDateBounds() {
     const today = new Date();
-
-    // Max DOB = today (can't be born in the future)
     const maxDate = today.toISOString().split('T')[0];
-
-    // Min DOB = 120 years ago
     const minDate = new Date(today);
     minDate.setFullYear(today.getFullYear() - 120);
     const minDateStr = minDate.toISOString().split('T')[0];
-
     const dobInput = document.getElementById('dob');
     if (dobInput) {
         dobInput.setAttribute('min', minDateStr);
@@ -32,39 +56,14 @@ function calculateDateBounds() {
 }
 
 /* ============================================================
-   MODULE: showError / clearError
-   Displays or removes an inline error message next to a field.
-   ============================================================ */
-function showError(fieldId, message) {
-    const errSpan = document.getElementById('err-' + fieldId);
-    if (errSpan) {
-        errSpan.textContent = '⚠ ' + message;
-        errSpan.style.display = 'inline';
-    }
-}
-
-function clearError(fieldId) {
-    const errSpan = document.getElementById('err-' + fieldId);
-    if (errSpan) {
-        errSpan.textContent = '';
-        errSpan.style.display = 'none';
-    }
-}
-
-/* ============================================================
-   MODULE: validateFirstName
-   Letters, apostrophes, and dashes only, 1–30 characters.
+   VALIDATION: First Name
+   Required. Letters, apostrophes, dashes only. 1–30 chars.
    ============================================================ */
 function validateFirstName() {
-    const field = document.getElementById('fname');
-    const val = field.value.trim();
-    const pattern = /^[A-Za-z'\-]{1,30}$/;
-    if (!val) {
-        showError('fname', 'First name is required.');
-        return false;
-    }
-    if (!pattern.test(val)) {
-        showError('fname', 'Letters, apostrophes, and dashes only (1–30 characters).');
+    const val = document.getElementById('fname').value.trim();
+    if (!val) { showError('fname', 'First name is required.'); return false; }
+    if (!/^[A-Za-z'\-]{1,30}$/.test(val)) {
+        showError('fname', 'Letters, apostrophes, and dashes only (1–30 chars).');
         return false;
     }
     clearError('fname');
@@ -72,15 +71,13 @@ function validateFirstName() {
 }
 
 /* ============================================================
-   MODULE: validateMiddleInitial
-   Optional: 1 letter only, no numbers.
+   VALIDATION: Middle Initial
+   Optional. 1 letter, no numbers.
    ============================================================ */
 function validateMiddleInitial() {
-    const field = document.getElementById('mi');
-    const val = field.value.trim();
-    if (val === '') { clearError('mi'); return true; } // optional
-    const pattern = /^[A-Za-z]$/;
-    if (!pattern.test(val)) {
+    const val = document.getElementById('mi').value.trim();
+    if (val === '') { clearError('mi'); return true; }
+    if (!/^[A-Za-z]$/.test(val)) {
         showError('mi', 'One letter only, no numbers.');
         return false;
     }
@@ -89,19 +86,14 @@ function validateMiddleInitial() {
 }
 
 /* ============================================================
-   MODULE: validateLastName
-   Letters, apostrophes, numbers 2–5 (ordinals), dashes, 1–30 chars.
+   VALIDATION: Last Name
+   Required. Letters, apostrophes, dashes only. 1–30 chars.
    ============================================================ */
 function validateLastName() {
-    const field = document.getElementById('lname');
-    const val = field.value.trim();
-    const pattern = /^[A-Za-z'\-2-5]{1,30}$/;
-    if (!val) {
-        showError('lname', 'Last name is required.');
-        return false;
-    }
-    if (!pattern.test(val)) {
-        showError('lname', 'Letters, apostrophes, dashes, and ordinal numbers (2–5) only.');
+    const val = document.getElementById('lname').value.trim();
+    if (!val) { showError('lname', 'Last name is required.'); return false; }
+    if (!/^[A-Za-z'\-]{1,30}$/.test(val)) {
+        showError('lname', 'Letters, apostrophes, and dashes only (1–30 chars).');
         return false;
     }
     clearError('lname');
@@ -109,49 +101,56 @@ function validateLastName() {
 }
 
 /* ============================================================
-   MODULE: validateDOB
-   Must be a valid date, not in the future, not more than 120 years ago.
+   VALIDATION: Date of Birth
+   Required. Not future. Not >120 years ago.
    ============================================================ */
 function validateDOB() {
-    const field = document.getElementById('dob');
-    const val = field.value;
-    if (!val) {
-        showError('dob', 'Date of birth is required.');
-        return false;
-    }
+    const val = document.getElementById('dob').value;
+    if (!val) { showError('dob', 'Date of birth is required.'); return false; }
     const dob = new Date(val);
-    if (isNaN(dob.getTime())) {
-        showError('dob', 'Please enter a valid date.');
-        return false;
-    }
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (dob > today) {
-        showError('dob', 'Date of birth cannot be in the future.');
-        return false;
-    }
-    const minDate = new Date();
-    minDate.setFullYear(minDate.getFullYear() - 120);
-    if (dob < minDate) {
-        showError('dob', 'Date of birth cannot be more than 120 years ago.');
-        return false;
-    }
+    if (isNaN(dob.getTime())) { showError('dob', 'Enter a valid date.'); return false; }
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (dob > today) { showError('dob', 'Date of birth cannot be in the future.'); return false; }
+    const minDate = new Date(); minDate.setFullYear(minDate.getFullYear() - 120);
+    if (dob < minDate) { showError('dob', 'Date cannot be more than 120 years ago.'); return false; }
     clearError('dob');
     return true;
 }
 
 /* ============================================================
-   MODULE: validateSSN
-   Format ###-##-#### (password field, obscured on screen).
-   Optional — but if entered, must match pattern.
+   AUTO-FORMAT: SSN  (called oninput)
+   Strips non-digits, inserts dashes at positions 3 and 5.
+   e.g. typing "123456789" auto-becomes "123-45-6789"
+   ============================================================ */
+function autoFormatSSN() {
+    const field = document.getElementById('ssn');
+    // Can't read value of password type during typing in some browsers,
+    // so we track via a hidden buffer input
+    let raw = field.dataset.raw || '';
+
+    // We can still read it — strip dashes and non-digits
+    let digits = field.value.replace(/\D/g, '').substring(0, 9);
+    field.dataset.raw = digits;
+
+    let formatted = digits;
+    if (digits.length > 5) {
+        formatted = digits.substring(0,3) + '-' + digits.substring(3,5) + '-' + digits.substring(5);
+    } else if (digits.length > 3) {
+        formatted = digits.substring(0,3) + '-' + digits.substring(3);
+    }
+    field.value = formatted;
+    validateSSN();
+}
+
+/* ============================================================
+   VALIDATION: SSN / ID
+   Optional. If entered: digits only, format ###-##-####.
    ============================================================ */
 function validateSSN() {
-    const field = document.getElementById('ssn');
-    const val = field.value.trim();
-    if (val === '') { clearError('ssn'); return true; } // optional
-    const pattern = /^\d{3}-\d{2}-\d{4}$/;
-    if (!pattern.test(val)) {
-        showError('ssn', 'Format must be ###-##-#### (e.g., 123-45-6789).');
+    const val = document.getElementById('ssn').value.trim();
+    if (val === '') { clearError('ssn'); return true; }
+    if (!/^\d{3}-\d{2}-\d{4}$/.test(val)) {
+        showError('ssn', 'Must be 9 digits in format ###-##-#### (numbers only).');
         return false;
     }
     clearError('ssn');
@@ -159,164 +158,99 @@ function validateSSN() {
 }
 
 /* ============================================================
-   MODULE: validateUserID
-   5–30 chars, no spaces, first char must be a letter,
-   only letters/numbers/underscore/dash allowed.
-   Converts to lowercase on blur.
+   VALIDATION: User ID
+   Required. 5–20 chars. Must start with letter.
+   Letters, numbers, underscore, dash only. No spaces.
+   Auto-lowercased on blur.
    ============================================================ */
 function validateUserID() {
     const field = document.getElementById('userid');
-    let val = field.value.trim();
-
-    if (!val) {
-        showError('userid', 'User ID is required.');
-        return false;
-    }
-    if (val.length < 5 || val.length > 30) {
-        showError('userid', 'User ID must be 5–30 characters long.');
-        return false;
-    }
-    if (/^\d/.test(val)) {
-        showError('userid', 'First character cannot be a number.');
-        return false;
-    }
-    if (/\s/.test(val)) {
-        showError('userid', 'No spaces allowed in User ID.');
-        return false;
-    }
-    const pattern = /^[A-Za-z][A-Za-z0-9_\-]{4,29}$/;
-    if (!pattern.test(val)) {
+    const val = field.value.trim();
+    if (!val) { showError('userid', 'User ID is required.'); return false; }
+    if (/^\d/.test(val)) { showError('userid', 'Must start with a letter, not a number.'); return false; }
+    if (/\s/.test(val)) { showError('userid', 'No spaces allowed in User ID.'); return false; }
+    if (val.length < 5) { showError('userid', 'User ID must be at least 5 characters.'); return false; }
+    if (val.length > 20) { showError('userid', 'User ID cannot exceed 20 characters.'); return false; }
+    if (!/^[A-Za-z][A-Za-z0-9_\-]{4,19}$/.test(val)) {
         showError('userid', 'Only letters, numbers, underscores, and dashes allowed.');
         return false;
     }
-
-    // Convert to lowercase and redisplay
     field.value = val.toLowerCase();
     clearError('userid');
+    // Re-validate password if it exists — it can't contain the user ID
+    const pwdVal = document.getElementById('pwd').value;
+    if (pwdVal) validatePassword();
     return true;
 }
 
 /* ============================================================
-   MODULE: validatePassword
-   8–30 chars, at least 1 uppercase, 1 lowercase, 1 digit, 1 special char.
-   No double quotes. Cannot contain user ID or name.
+   VALIDATION: Password
+   Required. 8–30 chars. At least 1 upper, 1 lower, 1 digit.
+   Cannot equal User ID.
    ============================================================ */
 function validatePassword() {
     const field = document.getElementById('pwd');
     const val = field.value;
     const userid = document.getElementById('userid').value.toLowerCase();
-    const fname = document.getElementById('fname').value.toLowerCase();
-    const lname = document.getElementById('lname').value.toLowerCase();
 
-    if (!val) {
-        showError('pwd', 'Password is required.');
-        return false;
-    }
-    if (val.length < 8) {
-        showError('pwd', 'Password must be at least 8 characters.');
-        return false;
-    }
-    if (val.length > 30) {
-        showError('pwd', 'Password cannot exceed 30 characters.');
-        return false;
-    }
-    if (!/[A-Z]/.test(val)) {
-        showError('pwd', 'Password must contain at least 1 uppercase letter.');
-        return false;
-    }
-    if (!/[a-z]/.test(val)) {
-        showError('pwd', 'Password must contain at least 1 lowercase letter.');
-        return false;
-    }
-    if (!/\d/.test(val)) {
-        showError('pwd', 'Password must contain at least 1 number.');
-        return false;
-    }
-    if (!/[!@#%^&*()\-_+=\/><.,`~]/.test(val)) {
-        showError('pwd', 'Password must contain at least 1 special character (!@#%^&* etc.).');
-        return false;
-    }
-    if (val.includes('"')) {
-        showError('pwd', 'Password cannot contain double quotes (").');
-        return false;
-    }
-    const valLower = val.toLowerCase();
-    if (userid && valLower.includes(userid)) {
+    if (!val) { showError('pwd', 'Password is required.'); updateStrengthBar(''); return false; }
+    if (val.length < 8) { showError('pwd', 'Password must be at least 8 characters.'); updateStrengthBar(val); return false; }
+    if (val.length > 30) { showError('pwd', 'Password cannot exceed 30 characters.'); updateStrengthBar(val); return false; }
+    if (!/[A-Z]/.test(val)) { showError('pwd', 'Must contain at least 1 uppercase letter.'); updateStrengthBar(val); return false; }
+    if (!/[a-z]/.test(val)) { showError('pwd', 'Must contain at least 1 lowercase letter.'); updateStrengthBar(val); return false; }
+    if (!/\d/.test(val)   ) { showError('pwd', 'Must contain at least 1 number.'); updateStrengthBar(val); return false; }
+    if (userid && val.toLowerCase().includes(userid)) {
         showError('pwd', 'Password cannot contain your User ID.');
+        updateStrengthBar(val);
         return false;
     }
-    if (fname && fname.length >= 3 && valLower.includes(fname)) {
-        showError('pwd', 'Password cannot contain your first name.');
-        return false;
-    }
-    if (lname && lname.length >= 3 && valLower.includes(lname)) {
-        showError('pwd', 'Password cannot contain your last name.');
-        return false;
-    }
-
     clearError('pwd');
-    updatePasswordStrength(val);
+    updateStrengthBar(val);
+    // Re-check match if pwd2 filled
+    if (document.getElementById('pwd2').value) validatePasswordMatch();
     return true;
 }
 
 /* ============================================================
-   MODULE: updatePasswordStrength
-   Visual strength indicator (Weak / Fair / Strong).
+   PASSWORD STRENGTH BAR
    ============================================================ */
-function updatePasswordStrength(val) {
+function updateStrengthBar(val) {
     const bar = document.getElementById('pwd-strength');
     if (!bar) return;
+    if (!val) { bar.textContent = ''; bar.className = 'pwd-strength'; return; }
     let score = 0;
     if (val.length >= 8) score++;
     if (/[A-Z]/.test(val)) score++;
     if (/[a-z]/.test(val)) score++;
     if (/\d/.test(val)) score++;
-    if (/[!@#%^&*()\-_+=\/><.,`~]/.test(val)) score++;
-
-    if (score <= 2) {
-        bar.textContent = 'Strength: Weak';
-        bar.className = 'pwd-strength weak';
-    } else if (score <= 3) {
-        bar.textContent = 'Strength: Fair';
-        bar.className = 'pwd-strength fair';
-    } else {
-        bar.textContent = 'Strength: Strong';
-        bar.className = 'pwd-strength strong';
-    }
+    if (/[!@#$%^&*()\-_+=\/><.,`~]/.test(val)) score++;
+    if (score <= 2) { bar.textContent = 'Strength: Weak';   bar.className = 'pwd-strength weak'; }
+    else if (score <= 3) { bar.textContent = 'Strength: Fair';   bar.className = 'pwd-strength fair'; }
+    else                 { bar.textContent = 'Strength: Strong'; bar.className = 'pwd-strength strong'; }
 }
 
 /* ============================================================
-   MODULE: validatePasswordMatch
-   Checks that pwd2 equals pwd.
+   VALIDATION: Password Match
    ============================================================ */
 function validatePasswordMatch() {
-    const pwd = document.getElementById('pwd').value;
+    const pwd  = document.getElementById('pwd').value;
     const pwd2 = document.getElementById('pwd2').value;
-    if (!pwd2) {
-        showError('pwd2', 'Please re-enter your password.');
-        return false;
-    }
-    if (pwd !== pwd2) {
-        showError('pwd2', 'Passwords do not match.');
-        return false;
-    }
+    if (!pwd2) { showError('pwd2', 'Please re-enter your password.'); return false; }
+    if (pwd !== pwd2) { showError('pwd2', 'Passwords do not match.'); return false; }
     clearError('pwd2');
     return true;
 }
 
 /* ============================================================
-   MODULE: validateEmail
-   Standard email format: name@domain.tld
+   VALIDATION: Email
+   Required. Format: name@domain.tld. Force lowercase on blur.
    ============================================================ */
 function validateEmail() {
     const field = document.getElementById('email');
+    field.value = field.value.toLowerCase(); // force lowercase
     const val = field.value.trim();
-    const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    if (!val) {
-        showError('email', 'Email address is required.');
-        return false;
-    }
-    if (!pattern.test(val)) {
+    if (!val) { showError('email', 'Email address is required.'); return false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(val)) {
         showError('email', 'Enter a valid email: name@domain.tld');
         return false;
     }
@@ -325,15 +259,34 @@ function validateEmail() {
 }
 
 /* ============================================================
-   MODULE: validatePhone
-   Format: (xxx) xxx-xxxx
+   AUTO-FORMAT: Phone (called oninput)
+   Strips non-digits and rebuilds (xxx) xxx-xxxx as user types.
+   ============================================================ */
+function autoFormatPhone() {
+    const field = document.getElementById('phone');
+    const digits = field.value.replace(/\D/g, '').substring(0, 10);
+    let formatted = digits;
+    if (digits.length > 6) {
+        formatted = '(' + digits.substring(0,3) + ') ' + digits.substring(3,6) + '-' + digits.substring(6);
+    } else if (digits.length > 3) {
+        formatted = '(' + digits.substring(0,3) + ') ' + digits.substring(3);
+    } else if (digits.length > 0) {
+        formatted = '(' + digits;
+    }
+    field.value = formatted;
+    if (digits.length === 10) validatePhone();
+    else if (digits.length > 0) showError('phone', 'Enter all 10 digits: (xxx) xxx-xxxx');
+    else clearError('phone');
+}
+
+/* ============================================================
+   VALIDATION: Phone
+   Optional. Format: (xxx) xxx-xxxx
    ============================================================ */
 function validatePhone() {
-    const field = document.getElementById('phone');
-    const val = field.value.trim();
-    if (val === '') { clearError('phone'); return true; } // optional
-    const pattern = /^\(\d{3}\)\s\d{3}-\d{4}$/;
-    if (!pattern.test(val)) {
+    const val = document.getElementById('phone').value.trim();
+    if (val === '') { clearError('phone'); return true; }
+    if (!/^\(\d{3}\)\s\d{3}-\d{4}$/.test(val)) {
         showError('phone', 'Format must be (xxx) xxx-xxxx');
         return false;
     }
@@ -342,141 +295,151 @@ function validatePhone() {
 }
 
 /* ============================================================
-   MODULE: validateAddress1
-   Required, 2–30 characters.
+   VALIDATION: Address Line 1
+   Required. 2–30 characters.
    ============================================================ */
 function validateAddress1() {
-    const field = document.getElementById('addr1');
-    const val = field.value.trim();
-    if (!val) {
-        showError('addr1', 'Address Line 1 is required.');
-        return false;
-    }
-    if (val.length < 2 || val.length > 30) {
-        showError('addr1', 'Address must be 2–30 characters.');
-        return false;
-    }
+    const val = document.getElementById('addr1').value.trim();
+    if (!val) { showError('addr1', 'Address Line 1 is required.'); return false; }
+    if (val.length < 2 || val.length > 30) { showError('addr1', 'Must be 2–30 characters.'); return false; }
     clearError('addr1');
     return true;
 }
 
 /* ============================================================
-   MODULE: validateAddress2
-   Optional — if entered, 2–30 characters.
+   VALIDATION: Address Line 2
+   Optional. If entered, 2–30 characters.
    ============================================================ */
 function validateAddress2() {
-    const field = document.getElementById('addr2');
-    const val = field.value.trim();
+    const val = document.getElementById('addr2').value.trim();
     if (val === '') { clearError('addr2'); return true; }
-    if (val.length < 2 || val.length > 30) {
-        showError('addr2', 'If entered, must be 2–30 characters.');
-        return false;
-    }
+    if (val.length < 2 || val.length > 30) { showError('addr2', 'If entered, must be 2–30 characters.'); return false; }
     clearError('addr2');
     return true;
 }
 
 /* ============================================================
-   MODULE: validateCity
-   Required, 2–30 characters.
+   VALIDATION: City
+   Required. 2–30 characters.
    ============================================================ */
 function validateCity() {
-    const field = document.getElementById('city');
-    const val = field.value.trim();
-    if (!val) {
-        showError('city', 'City is required.');
-        return false;
-    }
-    if (val.length < 2 || val.length > 30) {
-        showError('city', 'City must be 2–30 characters.');
-        return false;
-    }
+    const val = document.getElementById('city').value.trim();
+    if (!val) { showError('city', 'City is required.'); return false; }
+    if (val.length < 2 || val.length > 30) { showError('city', 'City must be 2–30 characters.'); return false; }
     clearError('city');
     return true;
 }
 
 /* ============================================================
-   MODULE: validateState
-   Must select a valid state (not the blank default).
+   VALIDATION: State
    ============================================================ */
 function validateState() {
     const field = document.getElementById('state');
-    if (!field.value) {
-        showError('state', 'Please select a state.');
-        return false;
-    }
+    if (!field.value) { showError('state', 'Please select a state.'); return false; }
     clearError('state');
     return true;
 }
 
 /* ============================================================
-   MODULE: validateZip
-   Required, 5 digits; allows zip+4 format (e.g. 77002-1234).
-   Truncates to first 5 digits and redisplays.
+   VALIDATION: Zip Code
+   Required. 5 digits or zip+4. Truncates to 5 on blur.
    ============================================================ */
 function validateZip() {
     const field = document.getElementById('zip');
-    let val = field.value.trim();
-    const pattern = /^\d{5}(-\d{4})?$/;
-    if (!val) {
-        showError('zip', 'Zip code is required.');
+    const val = field.value.trim();
+    if (!val) { showError('zip', 'Zip code is required.'); return false; }
+    if (!/^\d{5}(-\d{4})?$/.test(val)) {
+        showError('zip', 'Enter a valid 5-digit zip (e.g. 77002 or 77002-1234).');
         return false;
     }
-    if (!pattern.test(val)) {
-        showError('zip', 'Enter a valid zip code (e.g. 77002 or 77002-1234).');
-        return false;
-    }
-    // Truncate to first 5 digits and redisplay
-    field.value = val.substring(0, 5);
+    field.value = val.substring(0, 5); // truncate to 5 digits
     clearError('zip');
     return true;
 }
 
 /* ============================================================
-   MODULE: updateSalaryDisplay
-   Dynamically formats the range slider value as a salary.
+   VALIDATION: Symptoms Textarea
+   Optional. No HTML tags or double quotes.
    ============================================================ */
-function updateSalaryDisplay(value) {
-    const display = document.getElementById('health-val');
-    if (display) {
-        display.textContent = value;
+function validateSymptoms() {
+    const val = document.getElementById('symptoms').value.trim();
+    if (val === '') { clearError('symptoms'); return true; }
+    if (/<|>|"/.test(val)) {
+        showError('symptoms', 'Do not use HTML tags (<>) or double quotes (").');
+        return false;
     }
+    clearError('symptoms');
+    return true;
 }
+
 /* ============================================================
-   MODULE: showReview
-   Collects all form data and displays the review panel.
-   Called by the "Review" button.
+   SLIDER: Update displayed health value
+   ============================================================ */
+function updateHealthDisplay(value) {
+    const display = document.getElementById('health-val');
+    if (display) display.textContent = value;
+}
+
+/* ============================================================
+   VALIDATE ALL: called by VALIDATE button
+   Runs every validation. Shows/hides submit button.
+   ============================================================ */
+function validateAll() {
+    const results = [
+        validateFirstName(),
+        validateMiddleInitial(),
+        validateLastName(),
+        validateDOB(),
+        validateSSN(),
+        validateUserID(),
+        validatePassword(),
+        validatePasswordMatch(),
+        validateEmail(),
+        validatePhone(),
+        validateAddress1(),
+        validateAddress2(),
+        validateCity(),
+        validateState(),
+        validateZip(),
+        validateSymptoms()
+    ];
+
+    const allValid = results.every(r => r === true);
+    const submitBtn = document.getElementById('btn-submit');
+    const summaryRow = document.getElementById('error-summary-row');
+    const summary = document.getElementById('error-summary');
+
+    if (allValid) {
+        submitBtn.style.display = 'inline-block';
+        summaryRow.style.display = 'none';
+        summary.textContent = '';
+    } else {
+        submitBtn.style.display = 'none';
+        // Count errors
+        const errCount = results.filter(r => r === false).length;
+        summaryRow.style.display = '';
+        summary.innerHTML = '<span class="err-summary-msg">⚠ ' + errCount +
+            ' field(s) need attention. Please correct the highlighted errors above.</span>';
+    }
+    return allValid;
+}
+
+/* ============================================================
+   REVIEW PANEL: showReview()
+   Validates first, then renders summary table.
    ============================================================ */
 function showReview() {
-    // Run all validations first
-    const valid =
-        validateFirstName() &
-        validateMiddleInitial() &
-        validateLastName() &
-        validateDOB() &
-        validateSSN() &
-        validateUserID() &
-        validatePassword() &
-        validatePasswordMatch() &
-        validateEmail() &
-        validatePhone() &
-        validateAddress1() &
-        validateAddress2() &
-        validateCity() &
-        validateState() &
-        validateZip();
-
-    if (!valid) {
+    if (!validateAll()) {
         alert('Please fix the highlighted errors before reviewing.');
         return;
     }
 
-    // ---- Collect values ----
     const fname   = document.getElementById('fname').value.trim();
     const mi      = document.getElementById('mi').value.trim();
     const lname   = document.getElementById('lname').value.trim();
     const dob     = document.getElementById('dob').value;
-    const ssn     = document.getElementById('ssn').value ? '***-**-' + document.getElementById('ssn').value.slice(-4) : 'Not provided';
+    const ssnRaw  = document.getElementById('ssn').value;
+    const ssn     = ssnRaw ? '***-**-' + ssnRaw.slice(-4) : 'Not provided';
     const userid  = document.getElementById('userid').value;
     const email   = document.getElementById('email').value.trim();
     const phone   = document.getElementById('phone').value.trim() || 'Not provided';
@@ -486,17 +449,14 @@ function showReview() {
     const stateEl = document.getElementById('state');
     const state   = stateEl.options[stateEl.selectedIndex].text;
     const zip     = document.getElementById('zip').value.trim();
-    const symptoms= document.getElementById('symptoms').value.trim() || 'None provided';
     const health  = document.getElementById('health').value;
-    const healthFormatted = '$' + parseInt(health).toLocaleString() + '/yr';
+    const symptoms= document.getElementById('symptoms').value.trim() || 'None provided';
 
-    // Checkboxes
-    const checkboxes = document.querySelectorAll('input[name="history"]:checked');
+    const checkboxes  = document.querySelectorAll('input[name="history"]:checked');
     const historyList = checkboxes.length > 0
         ? Array.from(checkboxes).map(cb => cb.nextSibling.textContent.trim()).join(', ')
         : 'None selected';
 
-    // Radios
     const genderEl     = document.querySelector('input[name="gender"]:checked');
     const vaccinatedEl = document.querySelector('input[name="vaccinated"]:checked');
     const insuranceEl  = document.querySelector('input[name="insurance"]:checked');
@@ -504,105 +464,49 @@ function showReview() {
     const vaccinated = vaccinatedEl ? vaccinatedEl.value : 'Not selected';
     const insurance  = insuranceEl  ? insuranceEl.value  : 'Not selected';
 
-    // Full name display
     const fullName = fname + (mi ? ' ' + mi + '.' : '') + ' ' + lname;
 
-    // ---- Build the review HTML ----
+    const warn = (v, label) =>
+        v === 'Not provided' || v === 'Not selected'
+            ? `<td class="review-status warn">— ${label}</td>`
+            : `<td class="review-status pass">✔ OK</td>`;
+
     const reviewHTML = `
         <h2>📋 Please Review Your Information</h2>
         <p class="review-subtitle">Verify your details below before submitting.</p>
-
         <table class="review-table">
             <tr class="review-section-header"><td colspan="3">Personal Information</td></tr>
-            <tr>
-                <td class="review-label">Full Name</td>
-                <td class="review-value">${fullName}</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
-            <tr>
-                <td class="review-label">Date of Birth</td>
-                <td class="review-value">${dob}</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
-            <tr>
-                <td class="review-label">SSN (masked)</td>
-                <td class="review-value">${ssn}</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
-            <tr>
-                <td class="review-label">User ID</td>
-                <td class="review-value">${userid}</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
-            <tr>
-                <td class="review-label">Password</td>
-                <td class="review-value">••••••••</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
+            <tr><td class="review-label">Full Name</td><td class="review-value">${fullName}</td><td class="review-status pass">✔ OK</td></tr>
+            <tr><td class="review-label">Date of Birth</td><td class="review-value">${dob}</td><td class="review-status pass">✔ OK</td></tr>
+            <tr><td class="review-label">SSN (masked)</td><td class="review-value">${ssn}</td>${warn(ssn,'Not provided')}</tr>
+            <tr><td class="review-label">User ID</td><td class="review-value">${userid}</td><td class="review-status pass">✔ OK</td></tr>
+            <tr><td class="review-label">Password</td><td class="review-value">••••••••</td><td class="review-status pass">✔ OK</td></tr>
 
             <tr class="review-section-header"><td colspan="3">Contact Information</td></tr>
-            <tr>
-                <td class="review-label">Email</td>
-                <td class="review-value">${email}</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
-            <tr>
-                <td class="review-label">Phone</td>
-                <td class="review-value">${phone}</td>
-                <td class="review-status ${phone !== 'Not provided' ? 'pass">✔ OK' : 'warn">— Not provided'}</td>
-            </tr>
+            <tr><td class="review-label">Email</td><td class="review-value">${email}</td><td class="review-status pass">✔ OK</td></tr>
+            <tr><td class="review-label">Phone</td><td class="review-value">${phone}</td>${warn(phone,'Not provided')}</tr>
 
             <tr class="review-section-header"><td colspan="3">Address</td></tr>
-            <tr>
-                <td class="review-label">Address</td>
-                <td class="review-value">${addr1}${addr2 ? '<br>' + addr2 : ''}<br>${city}, ${state} ${zip}</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
+            <tr><td class="review-label">Address</td><td class="review-value">${addr1}${addr2 ? '<br>'+addr2 : ''}<br>${city}, ${state} ${zip}</td><td class="review-status pass">✔ OK</td></tr>
 
-            <tr class="review-section-header"><td colspan="3">Medical History &amp; Choices</td></tr>
-            <tr>
-                <td class="review-label">Medical History</td>
-                <td class="review-value">${historyList}</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
-            <tr>
-                <td class="review-label">Gender</td>
-                <td class="review-value">${gender}</td>
-                <td class="review-status ${gender !== 'Not selected' ? 'pass">✔ OK' : 'warn">— Not selected'}</td>
-            </tr>
-            <tr>
-                <td class="review-label">Vaccinated?</td>
-                <td class="review-value">${vaccinated}</td>
-                <td class="review-status ${vaccinated !== 'Not selected' ? 'pass">✔ OK' : 'warn">— Not selected'}</td>
-            </tr>
-            <tr>
-                <td class="review-label">Has Insurance?</td>
-                <td class="review-value">${insurance}</td>
-                <td class="review-status ${insurance !== 'Not selected' ? 'pass">✔ OK' : 'warn">— Not selected'}</td>
-            </tr>
-            <tr>
-                <td class="review-label">Desired Salary</td>
-                <td class="review-value">${healthFormatted}</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
-            <tr>
-                <td class="review-label">Symptoms / Notes</td>
-                <td class="review-value">${symptoms}</td>
-                <td class="review-status pass">✔ OK</td>
-            </tr>
+            <tr class="review-section-header"><td colspan="3">Medical History &amp; Preferences</td></tr>
+            <tr><td class="review-label">Medical History</td><td class="review-value">${historyList}</td><td class="review-status pass">✔ OK</td></tr>
+            <tr><td class="review-label">Gender</td><td class="review-value">${gender}</td>${warn(gender,'Not selected')}</tr>
+            <tr><td class="review-label">Vaccinated?</td><td class="review-value">${vaccinated}</td>${warn(vaccinated,'Not selected')}</tr>
+            <tr><td class="review-label">Has Insurance?</td><td class="review-value">${insurance}</td>${warn(insurance,'Not selected')}</tr>
+            <tr><td class="review-label">Overall Health</td><td class="review-value">${health} / 10</td><td class="review-status pass">✔ OK</td></tr>
+            <tr><td class="review-label">Symptoms / Notes</td><td class="review-value">${symptoms}</td><td class="review-status pass">✔ OK</td></tr>
         </table>
-
-        <div style="text-align:center; margin-top: 24px;">
-            <button type="button" onclick="document.getElementById('review-panel').style.display='none'" 
-                    style="background:#5d6d7e; color:#fff; padding:10px 28px; border-radius:5px; border:none; cursor:pointer; font-size:14px; margin-right:12px;">
+        <div style="text-align:center; margin-top:24px;">
+            <button type="button" onclick="document.getElementById('review-panel').style.display='none'"
+                    style="background:#5d6d7e;color:#fff;padding:10px 28px;border-radius:5px;border:none;cursor:pointer;font-size:14px;margin-right:12px;">
                 ← Go Back &amp; Edit
             </button>
             <button type="submit" form="reg-form"
-                    style="background:#1a5276; color:#fff; padding:10px 28px; border-radius:5px; border:none; cursor:pointer; font-size:14px;">
+                    style="background:#1a5276;color:#fff;padding:10px 28px;border-radius:5px;border:none;cursor:pointer;font-size:14px;">
                 ✔ Confirm &amp; Submit
             </button>
-        </div>
-    `;
+        </div>`;
 
     const panel = document.getElementById('review-panel');
     panel.innerHTML = reviewHTML;
@@ -611,57 +515,104 @@ function showReview() {
 }
 
 /* ============================================================
-   MODULE: initForm
-   Runs on DOMContentLoaded — sets up all event listeners.
+   RESET: hide submit button when form is cleared
+   ============================================================ */
+function handleReset() {
+    document.getElementById('btn-submit').style.display = 'none';
+    document.getElementById('review-panel').style.display = 'none';
+    document.getElementById('error-summary-row').style.display = 'none';
+    // Clear all error spans back to non-breaking space
+    document.querySelectorAll('.err').forEach(el => {
+        el.textContent = '\u00A0';
+        el.classList.remove('active');
+    });
+    // Clear strength bar
+    const bar = document.getElementById('pwd-strength');
+    if (bar) { bar.textContent = ''; bar.className = 'pwd-strength'; }
+    // Reset slider display
+    document.getElementById('health-val').textContent = '5';
+}
+
+/* ============================================================
+   INIT: wire up all event listeners
    ============================================================ */
 function initForm() {
     calculateDateBounds();
 
-    // Name fields
+    // ---- Name fields: validate on blur AND on input (for live feedback) ----
     document.getElementById('fname').addEventListener('blur', validateFirstName);
+    document.getElementById('fname').addEventListener('input', validateFirstName);
+
     document.getElementById('mi').addEventListener('blur', validateMiddleInitial);
+    document.getElementById('mi').addEventListener('input', validateMiddleInitial);
+
     document.getElementById('lname').addEventListener('blur', validateLastName);
+    document.getElementById('lname').addEventListener('input', validateLastName);
 
-    // DOB
-    document.getElementById('dob').addEventListener('blur', validateDOB);
+    // ---- DOB ----
     document.getElementById('dob').addEventListener('change', validateDOB);
+    document.getElementById('dob').addEventListener('blur', validateDOB);
 
-    // SSN
+    // ---- SSN: auto-format on input, validate on blur ----
+    document.getElementById('ssn').addEventListener('input', autoFormatSSN);
     document.getElementById('ssn').addEventListener('blur', validateSSN);
 
-    // User ID
+    // ---- User ID ----
     document.getElementById('userid').addEventListener('blur', validateUserID);
-
-    // Password - validate on input (on the fly)
-    document.getElementById('pwd').addEventListener('input', function() {
-        validatePassword();
-        // Re-check match if pwd2 is already filled
-        if (document.getElementById('pwd2').value) validatePasswordMatch();
+    document.getElementById('userid').addEventListener('input', function() {
+        // Lightweight check while typing
+        const val = this.value;
+        if (val.length >= 5) validateUserID();
     });
-    document.getElementById('pwd2').addEventListener('input', validatePasswordMatch);
 
-    // Contact
+    // ---- Password: validate on every keystroke ----
+    document.getElementById('pwd').addEventListener('input', validatePassword);
+    document.getElementById('pwd').addEventListener('blur', validatePassword);
+
+    // ---- Password match: check as user types in pwd2 ----
+    document.getElementById('pwd2').addEventListener('input', validatePasswordMatch);
+    document.getElementById('pwd2').addEventListener('blur', validatePasswordMatch);
+
+    // ---- Email: force lowercase + validate on blur ----
     document.getElementById('email').addEventListener('blur', validateEmail);
+    document.getElementById('email').addEventListener('input', function() {
+        this.value = this.value.toLowerCase();
+    });
+
+    // ---- Phone: auto-format on input ----
+    document.getElementById('phone').addEventListener('input', autoFormatPhone);
     document.getElementById('phone').addEventListener('blur', validatePhone);
 
-    // Address
+    // ---- Address ----
     document.getElementById('addr1').addEventListener('blur', validateAddress1);
+    document.getElementById('addr1').addEventListener('input', validateAddress1);
     document.getElementById('addr2').addEventListener('blur', validateAddress2);
+    document.getElementById('addr2').addEventListener('input', validateAddress2);
     document.getElementById('city').addEventListener('blur', validateCity);
+    document.getElementById('city').addEventListener('input', validateCity);
     document.getElementById('state').addEventListener('change', validateState);
     document.getElementById('zip').addEventListener('blur', validateZip);
+    document.getElementById('zip').addEventListener('input', function() {
+        if (this.value.length >= 5) validateZip();
+    });
 
-    // Salary slider
+    // ---- Symptoms ----
+    document.getElementById('symptoms').addEventListener('blur', validateSymptoms);
+    document.getElementById('symptoms').addEventListener('input', validateSymptoms);
+
+    // ---- Slider ----
     const slider = document.getElementById('health');
     if (slider) {
-        slider.addEventListener('input', function() {
-            updateSalaryDisplay(this.value);
-        });
-        updateSalaryDisplay(slider.value); // initialize display
+        slider.addEventListener('input', function() { updateHealthDisplay(this.value); });
+        updateHealthDisplay(slider.value);
     }
 
-    // Review button
+    // ---- Buttons ----
+    document.getElementById('btn-validate').addEventListener('click', validateAll);
     document.getElementById('btn-review').addEventListener('click', showReview);
+    document.getElementById('btn-reset').addEventListener('click', function() {
+        setTimeout(handleReset, 10); // after reset clears fields
+    });
 }
 
 document.addEventListener('DOMContentLoaded', initForm);
