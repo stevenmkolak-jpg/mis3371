@@ -1,18 +1,18 @@
 /*
-  Program name: style.css
+  Program name: style3.css
   Author: STEVEN KOLAK
   Date created: 2/27/26
-  Date last edited: 3/27/26
-  Version: 2.0
-  Description: External stylesheet for ClearPath Medical Patient Registration Form.
-               Updated for Homework 2: review panel, inline error messages,
-               password strength indicator, section headers, review table.
+  Date last edited: 4/18/26
+  Version: 3.0
+  Description: External stylesheet for ClearPath Medical Patient Registration Form (HW3).
+               Error spans are pre-sized so the form never jumps when errors appear/clear.
+               Added error-summary styles and validate button style.
 */
 
 /* ===== IMPORT GOOGLE FONT ===== */
 @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&family=Merriweather:wght@700&display=swap');
 
-/* ===== BODY TAG SELECTOR ===== */
+/* ===== BODY ===== */
 body {
     background-color: #eef4f9;
     font-family: 'Nunito', sans-serif;
@@ -22,7 +22,7 @@ body {
     padding: 0;
 }
 
-/* ===== ID SELECTOR - banner div ===== */
+/* ===== BANNER ===== */
 #banner {
     background-color: #1a5276;
     color: #ffffff;
@@ -49,7 +49,7 @@ body {
     color: #aed6f1;
 }
 
-/* ===== TAG SELECTOR - headings ===== */
+/* ===== HEADINGS ===== */
 h1, h2, h3 {
     font-family: 'Merriweather', serif;
     color: #1a5276;
@@ -61,7 +61,7 @@ h2 {
     margin-top: 25px;
 }
 
-/* ===== ID SELECTOR - main form container ===== */
+/* ===== FORM CONTAINER ===== */
 #form-container {
     max-width: 980px;
     margin: 30px auto;
@@ -71,7 +71,7 @@ h2 {
     box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
-/* ===== TAG SELECTOR - table inside form ===== */
+/* ===== TABLE ===== */
 table {
     width: 100%;
     border-collapse: collapse;
@@ -82,7 +82,7 @@ td {
     vertical-align: middle;
 }
 
-/* ===== CLASS SELECTOR - label cells ===== */
+/* ===== LABEL CELLS ===== */
 .label {
     width: 160px;
     font-weight: 600;
@@ -92,7 +92,7 @@ td {
     white-space: nowrap;
 }
 
-/* ===== CLASS SELECTOR - section header rows ===== */
+/* ===== SECTION HEADER ROWS ===== */
 .section-header td {
     background-color: #d6eaf8;
     font-weight: 700;
@@ -104,7 +104,7 @@ td {
     border-bottom: 1px solid #aed6f1;
 }
 
-/* ===== TAG SELECTOR - inputs, selects, textarea ===== */
+/* ===== INPUTS, SELECTS, TEXTAREA ===== */
 input[type="text"],
 input[type="email"],
 input[type="password"],
@@ -140,17 +140,38 @@ input[type="range"] {
     cursor: pointer;
 }
 
-/* ===== CLASS SELECTOR - inline error messages ===== */
+/* ===== ERROR SPANS — pre-reserved height so form never jumps ===== */
 .err {
-    display: none;
-    color: #c0392b;
+    display: block;          /* always takes up space */
+    min-height: 18px;        /* reserved height */
+    color: transparent;      /* invisible when no error */
     font-size: 12px;
     font-weight: 600;
-    margin-left: 6px;
-    vertical-align: middle;
+    margin-top: 2px;
+    line-height: 18px;
+    transition: color 0.15s ease;
 }
 
-/* ===== CLASS SELECTOR - password strength indicator ===== */
+/* When error is active, make it visible */
+.err.active {
+    color: #c0392b;
+}
+
+/* ===== ERROR SUMMARY ===== */
+.err-summary-msg {
+    display: block;
+    background: #fdf2f2;
+    border: 1px solid #e8a0a0;
+    border-radius: 4px;
+    color: #c0392b;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 10px 16px;
+    margin-top: 10px;
+    text-align: center;
+}
+
+/* ===== PASSWORD STRENGTH ===== */
 .pwd-strength {
     display: inline-block;
     font-size: 12px;
@@ -158,30 +179,20 @@ input[type="range"] {
     margin-left: 8px;
     padding: 2px 8px;
     border-radius: 3px;
+    vertical-align: middle;
 }
 
-.pwd-strength.weak {
-    background-color: #fadbd8;
-    color: #c0392b;
-}
+.pwd-strength.weak   { background-color: #fadbd8; color: #c0392b; }
+.pwd-strength.fair   { background-color: #fdebd0; color: #d35400; }
+.pwd-strength.strong { background-color: #d5f5e3; color: #196f3d; }
 
-.pwd-strength.fair {
-    background-color: #fdebd0;
-    color: #d35400;
-}
-
-.pwd-strength.strong {
-    background-color: #d5f5e3;
-    color: #196f3d;
-}
-
-/* ===== CLASS SELECTOR - slider label ===== */
+/* ===== SLIDER LABEL ===== */
 .slider-label {
     font-size: 13px;
     color: #5d6d7e;
 }
 
-/* ===== TAG SELECTOR - reset and submit input buttons ===== */
+/* ===== BUTTONS ===== */
 input[type="reset"] {
     font-family: 'Nunito', sans-serif;
     font-size: 14px;
@@ -202,11 +213,10 @@ input[type="submit"] {
     border-radius: 5px;
     border: none;
     cursor: pointer;
-    background-color: #1a5276;
+    background-color: #1a7a3a;
     color: #ffffff;
 }
 
-/* ===== TAG SELECTOR - buttons ===== */
 button {
     font-family: 'Nunito', sans-serif;
     font-size: 14px;
@@ -220,13 +230,18 @@ button {
     color: #ffffff;
 }
 
+/* Validate button gets a distinct color */
+#btn-validate {
+    background-color: #2471a3;
+}
+
 button:hover,
 input[type="reset"]:hover,
 input[type="submit"]:hover {
     opacity: 0.85;
 }
 
-/* ===== ID SELECTOR - review panel ===== */
+/* ===== REVIEW PANEL ===== */
 #review-panel {
     max-width: 980px;
     margin: 24px auto 30px;
@@ -249,7 +264,6 @@ input[type="submit"]:hover {
     margin-bottom: 20px;
 }
 
-/* ===== CLASS SELECTOR - review table ===== */
 .review-table {
     width: 100%;
     border-collapse: collapse;
@@ -262,7 +276,6 @@ input[type="submit"]:hover {
     vertical-align: top;
 }
 
-/* ===== CLASS SELECTOR - review section header rows ===== */
 .review-section-header td {
     background-color: #1a5276;
     color: #ffffff;
@@ -272,7 +285,6 @@ input[type="submit"]:hover {
     letter-spacing: 0.5px;
 }
 
-/* ===== CLASS SELECTOR - review label column ===== */
 .review-label {
     width: 200px;
     font-weight: 600;
@@ -281,12 +293,8 @@ input[type="submit"]:hover {
     padding-right: 20px;
 }
 
-/* ===== CLASS SELECTOR - review value column ===== */
-.review-value {
-    color: #2c3e50;
-}
+.review-value { color: #2c3e50; }
 
-/* ===== CLASS SELECTOR - review status column ===== */
 .review-status {
     width: 110px;
     font-weight: 700;
@@ -295,19 +303,11 @@ input[type="submit"]:hover {
     white-space: nowrap;
 }
 
-.review-status.pass {
-    color: #196f3d;
-}
+.review-status.pass  { color: #196f3d; }
+.review-status.warn  { color: #d35400; }
+.review-status.error { color: #c0392b; }
 
-.review-status.warn {
-    color: #d35400;
-}
-
-.review-status.error {
-    color: #c0392b;
-}
-
-/* ===== ID SELECTOR - footer ===== */
+/* ===== FOOTER ===== */
 #footer {
     background-color: #1a5276;
     color: #aed6f1;
@@ -321,39 +321,15 @@ input[type="submit"]:hover {
     flex-wrap: wrap;
 }
 
-#footer p {
-    margin: 4px 0;
-}
+#footer p { margin: 4px 0; }
+#footer-left  { text-align: left; }
+#footer-center { text-align: center; }
+#footer-right  { text-align: right; }
 
-#footer-left {
-    text-align: left;
-}
+#footer a { color: #aed6f1; text-decoration: none; margin: 0 6px; }
+a:visited  { color: #7fb3d3; }
+a:hover    { color: #ffffff; text-decoration: underline; }
 
-#footer-center {
-    text-align: center;
-}
-
-#footer-right {
-    text-align: right;
-}
-
-#footer a {
-    color: #aed6f1;
-    text-decoration: none;
-    margin: 0 6px;
-}
-
-/* ===== TAG SELECTOR - visited links ===== */
-a:visited {
-    color: #7fb3d3;
-}
-
-a:hover {
-    color: #ffffff;
-    text-decoration: underline;
-}
-
-/* ===== Footer contact button ===== */
 #footer-center button {
     background-color: #aed6f1;
     color: #1a5276;
